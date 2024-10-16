@@ -1,5 +1,5 @@
 export default defineNuxtRouteMiddleware(async (to, from) => {
-  const authenticated = useCookie("token");
+  const token = useCookie("token");
 
   try {
     const response: any = await $fetch(
@@ -7,10 +7,17 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
       {
         method: "GET",
         headers: {
-          Authorization: `Bearer ${authenticated.value}`,
+          Authorization: `Bearer ${token.value}`,
         },
       }
     );
+
+    if (
+      response.status == "success" &&
+      (to.path == "/login" || to.path == "/register")
+    ) {
+      return navigateTo("/");
+    }
   } catch {
     if (to.path == "/login" || to.path == "/register") {
       return;
